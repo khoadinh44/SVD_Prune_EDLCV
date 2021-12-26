@@ -41,8 +41,8 @@ def orthogology_loss(mat,device = 'cpu'):
             mulmat = mat.matmul(mat.transpose(0,1)) #AxA'
         else:
             mulmat = mat.transpose(0,1).matmul(mat) #A'xA
-        cross_entropy_loss = nn.CrossEntropyLoss()
         # https://neptune.ai/blog/pytorch-loss-functions
-        loss = cross_entropy_loss(mulmat, torch.eye(mulmat.size(0),device = device))
+        cross_entropy_loss = nn.CrossEntropyLoss()
+        loss = cross_entropy_loss(mulmat, torch.eye(mulmat.size(0),device = device))/(mulmat.size(0)*mulmat.size(1))
         # loss = torch.sum((mulmat-torch.eye(mulmat.size(0),device = device))**2)/(mulmat.size(0)*mulmat.size(1))
     return loss
