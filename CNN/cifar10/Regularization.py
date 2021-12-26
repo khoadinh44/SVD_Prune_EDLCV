@@ -1,4 +1,5 @@
 import torch
+import torch.nn as nn
 
 def Reg_Loss(parameters,reg_type = 'Hoyer'):
     """
@@ -37,8 +38,11 @@ def orthogology_loss(mat,device = 'cpu'):
     loss = 0.0
     if mat.requires_grad:
         if mat.size(0)<=mat.size(1):
-            mulmat = mat.matmul(mat.transpose(0,1))#AxA'
+            mulmat = mat.matmul(mat.transpose(0,1)) #AxA'
         else:
-            mulmat = mat.transpose(0,1).matmul(mat)#A'xA
-        loss = torch.sum((mulmat-torch.eye(mulmat.size(0),device = device))**2)/(mulmat.size(0)*mulmat.size(1))
+            mulmat = mat.transpose(0,1).matmul(mat) #A'xA
+        cross_entropy_loss = nn.CrossEntropyLoss()
+        # https://neptune.ai/blog/pytorch-loss-functions
+        loss = cross_entropy_loss(mulmat, torch.eye(mulmat.size(0),device = device))
+        # loss = torch.sum((mulmat-torch.eye(mulmat.size(0),device = device))**2)/(mulmat.size(0)*mulmat.size(1))
     return loss
