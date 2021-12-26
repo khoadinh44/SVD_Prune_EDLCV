@@ -9,7 +9,8 @@ def Reg_Loss(parameters,reg_type = 'Hoyer'):
     for param in parameters:
         if param.requires_grad and torch.sum(torch.abs(param))>0:
             if reg_type == "Hoyer":
-                reg += torch.sum(torch.abs(param))/torch.sqrt(torch.sum(param**2))-1#Hoyer
+                reg += torch.sum(0.5*torch.sqrt(torch.sum(param**2)) + 0.5*torch.abs(param))
+                # reg += torch.sum(torch.abs(param))/torch.sqrt(torch.sum(param**2))-1#Hoyer
             elif reg_type == "Hoyer-Square":
                 reg += (torch.sum(torch.abs(param))**2)/torch.sum(param**2)-1#Hoyer-Square
             elif reg_type == "L1":    
@@ -41,8 +42,8 @@ def orthogology_loss(mat,device = 'cpu'):
             mulmat = mat.matmul(mat.transpose(0,1)) #AxA'
         else:
             mulmat = mat.transpose(0,1).matmul(mat) #A'xA
-        # https://neptune.ai/blog/pytorch-loss-functions
         cross_entropy_loss = nn.CrossEntropyLoss()
-        loss = cross_entropy_loss(mulmat, torch.eye(mulmat.size(0),device = device))/(mulmat.size(0)*mulmat.size(1))
+        # https://neptune.ai/blog/pytorch-loss-functions
+        loss = cross_entropy_loss(mulmat, torch.eye(mulmat.size(0), device = device))/(mulmat.size(0)*mulmat.size(1))
         # loss = torch.sum((mulmat-torch.eye(mulmat.size(0),device = device))**2)/(mulmat.size(0)*mulmat.size(1))
     return loss
